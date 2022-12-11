@@ -1,18 +1,21 @@
 # Loading Packages
 import pandas as pd
-import numpy as np
+# import numpy as np
 import matplotlib.pyplot as plt
 import plotly.express as px
 import streamlit as st
-
-st.set_page_config(layout="wide")
 from fredapi import Fred
+st.set_page_config(layout="wide")
+
 
 # Using FRED API Key
 fred_key = 'e97ead98bf794c0a4316ef8c10370f31'
 
 # CREATING FRED OBJECT
-fred = Fred(api_key=fred_key)
+try:
+    fred = Fred(api_key=fred_key)
+except ValueError:
+    print('Create your API key. Instructions in readme.md')
 
 # # PULLING RAW DATA - SERIES
 # il_gdp = fred.get_series('NGMP16980')
@@ -186,7 +189,7 @@ def create_plot(parameter, y_axis_title, df):
     :param df: data used to plot data
     :return: plot with formatting
     """
-    figure = px.line(df, title=f'{parameter} of {states_selection}')
+    figure = px.line(df, title=f'{parameter} of {states_selection}', markers=True)
 
     # updating title, and layout of plot
     figure.update_layout(
@@ -197,6 +200,8 @@ def create_plot(parameter, y_axis_title, df):
             family="Courier New, monospace",
             size=18
         ))
+
+    figure.update_layout(showlegend=False)
 
     return figure
 
@@ -213,19 +218,13 @@ with GDP_plot:
 
     chart_selected_df = fred.get_series(state_mapping[states_selection][0])
 
-    # Plotting data v/s year
-    fig = create_plot('GDP(Farms)', 'Millions of Dollars', chart_selected_df)
-
-    # Converting series into dataframe
     chart_selected_df = pd.DataFrame(chart_selected_df, columns=['GDP_value'])
-    # extracting only year from date column
-    year_df = chart_selected_df.index
-    year_df = year_df.astype(str).str[:4]
-
-    # resetting index with just year
-    chart_selected_df.set_index(year_df, inplace=True, drop=True)
-    # Dropping first column (to get years from 1998 instead of 1997)
+    chart_selected_df.index = chart_selected_df.index.year
+    chart_selected_df.index = chart_selected_df.index.astype('str')
     chart_selected_df = chart_selected_df.iloc[1:, :]
+
+    # Plotting data v/s year
+    fig = create_plot('GDP(Farms)', '$ (Millions)', chart_selected_df)
 
     st.write(fig)
 
