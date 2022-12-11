@@ -179,6 +179,28 @@ def calc_corr(df, climate_df):
     return correlation
 
 
+def create_plot(parameter, y_axis_title, df):
+    """
+    :param parameter: parameter based on which graph is plotted v/s year
+    :param y_axis_title: title of y-axis
+    :param df: data used to plot data
+    :return: plot with formatting
+    """
+    figure = px.line(df, title=f'{parameter} of {states_selection}')
+
+    # updating title, and layout of plot
+    figure.update_layout(
+        title=f'{parameter} of {states_selection}',
+        xaxis_title="year",
+        yaxis_title=f'{y_axis_title}',
+        font=dict(
+            family="Courier New, monospace",
+            size=18
+        ))
+
+    return figure
+
+
 with GDP_plot:
     st.header("Agriculture GDP statewise")
     st.text("Real Gross Domestic Product: Farms ")
@@ -191,17 +213,8 @@ with GDP_plot:
 
     chart_selected_df = fred.get_series(state_mapping[states_selection][0])
 
-    fig = px.line(chart_selected_df)
-
-    # updating title, and layout of plot
-    fig.update_layout(
-        title=f'GDP (Farms) of {states_selection}',
-        xaxis_title="year",
-        yaxis_title="Millions of Dollars",
-        font=dict(
-            family="Courier New, monospace",
-            size=18
-        ))
+    # Plotting data v/s year
+    fig = create_plot('GDP(Farms)', 'Millions of Dollars', chart_selected_df)
 
     # Converting series into dataframe
     chart_selected_df = pd.DataFrame(chart_selected_df, columns=['GDP_value'])
@@ -229,24 +242,13 @@ with climate_plots_A:
     print(f'Climate series head : {climate_series_1.head()}')
 
     # Creating plot
-    fig_climate = px.line(climate_series_1, title=f'Precipitation of {states_selection} ')
-
-    # updating title, and layout of plot
-    fig_climate.update_layout(
-        title=f'Precipitation of {states_selection}',
-        xaxis_title="year",
-        yaxis_title="precipitation in mm",
-        # legend_title="GDP in millions",
-        font=dict(
-            family="Courier New, monospace",
-            size=18
-        ))
+    fig_1 = create_plot('Precipitation', 'precipitation in mm', climate_series_1)
 
     # Correlation metric for precipitation
     corr = calc_corr(chart_selected_df, climate_series_1)
 
     left_col.metric(label="Correlation", value=corr)
-    left_col.write(fig_climate)
+    left_col.write(fig_1)
 
     ################################################################################################
 
@@ -257,53 +259,29 @@ with climate_plots_A:
     print(f'Climate series No 2 head : {climate_series_2.head()}')
 
     # Creating plot 2
-    fig_climate_2 = px.line(climate_series_2, title=f'Heating Degree Days of {states_selection} ')
-
-    # Updating title and layout of plot
-    fig_climate_2.update_layout(
-        title=f'Heating Degree days of {states_selection}',
-        xaxis_title="year",
-        yaxis_title="Fahrenheit Degree-Days",
-        # legend_title="GDP in millions",
-        font=dict(
-            family="Courier New, monospace",
-            size=18
-        ))
+    fig_2 = create_plot('Heating Degree days', 'Fahrenheit Degree-Days', climate_series_2)
 
     # Correlation metric for heating days
     corr_2 = calc_corr(chart_selected_df, climate_series_2)
 
     right_col.metric(label="Correlation", value=corr_2)
-    right_col.write(fig_climate_2)
+    right_col.write(fig_2)
 
 with climate_plots_B:
     left_col, right_col = st.columns([3, 3])
 
     # getting Max temp of state
     climate_series_3 = get_climate_data('1998', '2022', 'tmax', state_mapping[states_selection][1])
-
     # climate_series = pd.read_csv(climate_series_url, index_col='Date' , skiprows=4, usecols=['Value', 'Date'])
     print(f'Climate series head : {climate_series_3.head()}')
 
     # Creating plot
-    fig_climate = px.line(climate_series_3, title=f'Maximum Temp of {states_selection} ')
-
-    # updating title, and layout of plot
-    fig_climate.update_layout(
-        title=f'Max temp of {states_selection}',
-        xaxis_title="year",
-        yaxis_title="Degrees Fahrenheit",
-        # legend_title="GDP in millions",
-        font=dict(
-            family="Courier New, monospace",
-            size=18
-        ))
-
+    fig_3 = create_plot('Max temp', '°F', climate_series_3)
     # Correlation metric for precipitation
     corr_3 = calc_corr(chart_selected_df, climate_series_3)
 
     left_col.metric(label="Correlation", value=corr_3)
-    left_col.write(fig_climate)
+    left_col.write(fig_3)
 
     ################################################################################################
 
@@ -314,21 +292,11 @@ with climate_plots_B:
     print(f'Climate series No 2 head : {climate_series_4.head()}')
 
     # Creating plot 2
-    fig_climate_2 = px.line(climate_series_4, title=f'Min Temp of {states_selection} ')
+    fig_4 = create_plot('Mim temp', '°F', climate_series_4)
 
-    # Updating title and layout of plot
-    fig_climate_2.update_layout(
-        title=f'Min temp of {states_selection}',
-        xaxis_title="year",
-        yaxis_title="Degree Fahrenheit ",
-        # legend_title="GDP in millions",
-        font=dict(
-            family="Courier New, monospace",
-            size=18
-        ))
 
     # Correlation metric for heating days
     corr_4 = calc_corr(chart_selected_df, climate_series_4)
 
     right_col.metric(label="Correlation", value=corr_4)
-    right_col.write(fig_climate_2)
+    right_col.write(fig_4)
