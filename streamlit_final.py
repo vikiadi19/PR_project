@@ -1,16 +1,15 @@
-
 # Loading Packages
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import plotly.express as px
 import streamlit as st
+
 st.set_page_config(layout="wide")
 from fredapi import Fred
 
-#Using FRED API Key
+# Using FRED API Key
 fred_key = 'e97ead98bf794c0a4316ef8c10370f31'
-
 
 # CREATING FRED OBJECT
 fred = Fred(api_key=fred_key)
@@ -22,60 +21,59 @@ plt.style.use('fivethirtyeight')
 pd.options.display.max_columns = 500
 color_pal = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 
-
 state_mapping_GDP = {
- 'California' : 'CARGSP',
- 'Florida' : 'FLRGSP',
- 'Minnesota' : 'MNRGSP',
- 'Texas' : 'TXRGSP',
- 'New York' : 'NYRGSP',
- 'Pennsylvania' : 'PARGSP',
- 'Alaska' : 'AKRGSP',
- 'Illinois' : 'ILRGSP',
- 'Utah' : 'UTRGSP',
- 'Louisiana' : 'LARGSP',
- 'Hawaii' : 'HIRGSP',
- 'Virginia' : 'VARGSP',
- 'South Carolina' : 'SCRGSP',
- 'Alabama' : 'ALRGSP',
- 'Ohio' : 'OHRGSP',
- 'Mississippi' : 'MSRGSP',
- 'Wyoming' : 'WYRGSP',
- 'Michigan' : 'MIRGSP',
- 'North Dakota' : 'NDRGSP',
- 'Massachusetts' : 'MARGSP',
- 'Wisconsin' : 'WIRGSP',
- 'Georgia' : 'GARGSP',
- 'North Carolina' : 'NCRGSP',
- 'Arizona' : 'AZRGSP',
- 'Kansas' : 'KSRGSP',
- 'Colorado' : 'CORGSP',
- 'Montana' : 'MTRGSP',
- 'New Mexico' : 'NMRGSP',
- 'Iowa' : 'IARGSP',
- 'Idaho' : 'IDRGSP',
- 'Delaware' : 'DERGSP',
- 'Maryland' : 'MDRGSP',
- 'New Jersey' : 'NJRGSP',
- 'Tennessee' : 'TNRGSP',
- 'Vermont' : 'VTRGSP',
- 'Oklahoma' : 'OKRGSP',
- 'Nebraska' : 'NERGSP',
- 'Kentucky' : 'KYRGSP',
- 'Oregon' : 'ORRGSP',
- 'Missouri' : 'MORGSP',
- 'Connecticut' : 'CTRGSP',
- 'Washington' : 'WARGSP',
- 'West Virginia' : 'WVRGSP',
- 'Arkansas' : 'ARRGSP',
- 'Nevada' : 'NVRGSP',
- 'Maine' : 'MERGSP',
- 'South Dakota' : 'SDRGSP',
- 'the District of Columbia' : 'DCRGSP',
- 'Rhode Island' : 'RIRGSP',
- 'Indiana' : 'INRGSP',
-#  'the United States' : 'USRGSP',
- 'New Hampshire' : 'NHRGSP'
+    'California': 'CARGSP',
+    'Florida': 'FLRGSP',
+    'Minnesota': 'MNRGSP',
+    'Texas': 'TXRGSP',
+    'New York': 'NYRGSP',
+    'Pennsylvania': 'PARGSP',
+    'Alaska': 'AKRGSP',
+    'Illinois': 'ILRGSP',
+    'Utah': 'UTRGSP',
+    'Louisiana': 'LARGSP',
+    'Hawaii': 'HIRGSP',
+    'Virginia': 'VARGSP',
+    'South Carolina': 'SCRGSP',
+    'Alabama': 'ALRGSP',
+    'Ohio': 'OHRGSP',
+    'Mississippi': 'MSRGSP',
+    'Wyoming': 'WYRGSP',
+    'Michigan': 'MIRGSP',
+    'North Dakota': 'NDRGSP',
+    'Massachusetts': 'MARGSP',
+    'Wisconsin': 'WIRGSP',
+    'Georgia': 'GARGSP',
+    'North Carolina': 'NCRGSP',
+    'Arizona': 'AZRGSP',
+    'Kansas': 'KSRGSP',
+    'Colorado': 'CORGSP',
+    'Montana': 'MTRGSP',
+    'New Mexico': 'NMRGSP',
+    'Iowa': 'IARGSP',
+    'Idaho': 'IDRGSP',
+    'Delaware': 'DERGSP',
+    'Maryland': 'MDRGSP',
+    'New Jersey': 'NJRGSP',
+    'Tennessee': 'TNRGSP',
+    'Vermont': 'VTRGSP',
+    'Oklahoma': 'OKRGSP',
+    'Nebraska': 'NERGSP',
+    'Kentucky': 'KYRGSP',
+    'Oregon': 'ORRGSP',
+    'Missouri': 'MORGSP',
+    'Connecticut': 'CTRGSP',
+    'Washington': 'WARGSP',
+    'West Virginia': 'WVRGSP',
+    'Arkansas': 'ARRGSP',
+    'Nevada': 'NVRGSP',
+    'Maine': 'MERGSP',
+    'South Dakota': 'SDRGSP',
+    'the District of Columbia': 'DCRGSP',
+    'Rhode Island': 'RIRGSP',
+    'Indiana': 'INRGSP',
+    #  'the United States' : 'USRGSP',
+    'New Hampshire': 'NHRGSP'
 }
 
 # Dict --> State: [GDP code,
@@ -88,7 +86,7 @@ state_mapping = {'California': ['CAFARMRGSP', 4],
                  'Alaska': ['AKFARMRGSP', 50],
                  'Illinois': ['ILFARMRGSP', 11],
                  'Utah': ['UTFARMRGSP', 42],
-                 'Louisiana': ['LAFARMRGSP', 16], 
+                 'Louisiana': ['LAFARMRGSP', 16],
                  'Hawaii': ['HIFARMRGSP'],
                  'Virginia': ['VAFARMRGSP', 44],
                  'South Carolina': ['SCFARMRGSP', 38],
@@ -108,52 +106,44 @@ state_mapping = {'California': ['CAFARMRGSP', 4],
                  'Montana': ['MTFARMRGSP', 24],
                  'New Mexico': ['NMFARMRGSP', 29],
                  'Iowa': ['IAFARMRGSP', 13],
-                 'Idaho': ['IDFARMRGSP', 10], 
+                 'Idaho': ['IDFARMRGSP', 10],
                  'Delaware': ['DEFARMRGSP', 7],
                  'Maryland': ['MDFARMRGSP', 18],
-                 'New Jersey': ['NJFARMRGSP', 28], 
-                 'Tennessee': ['TNFARMRGSP', 40], 
+                 'New Jersey': ['NJFARMRGSP', 28],
+                 'Tennessee': ['TNFARMRGSP', 40],
                  'Vermont': ['VTFARMRGSP', 43],
                  'Oklahoma': ['OKFARMRGSP', 34],
                  'Nebraska': ['NEFARMRGSP', 25],
-                 'Kentucky': ['KYFARMRGSP', 15], 
+                 'Kentucky': ['KYFARMRGSP', 15],
                  'Oregon': ['ORFARMRGSP', 35],
                  'Missouri': ['MOFARMRGSP', 23],
-                 'Connecticut': ['CTFARMRGSP', 6], 
-                 'Washington': ['WAFARMRGSP', 45], 
+                 'Connecticut': ['CTFARMRGSP', 6],
+                 'Washington': ['WAFARMRGSP', 45],
                  'West Virginia': ['WVFARMRGSP', 46],
-                 'Arkansas': ['ARFARMRGSP', 3], 
-                 'Nevada': ['NVFARMRGSP', 26], 
+                 'Arkansas': ['ARFARMRGSP', 3],
+                 'Nevada': ['NVFARMRGSP', 26],
                  'Maine': ['MEFARMRGSP', 17],
                  'South Dakota': ['SDFARMRGSP', 39],
                  'the District of Columbia': ['DCFARMRGSP'],
-                 'Rhode Island': ['RIFARMRGSP', 37], 
+                 'Rhode Island': ['RIFARMRGSP', 37],
                  'Indiana': ['INFARMRGSP', 12],
                  'New Hampshire': ['NHFARMRGSP', 27]}
 
-parameter_dict = {'Average Temperature': 'tavg', 'Maximum Temperature': 'tmax', 'Minimum Temperature': 'tmin',\
-             'Precipitation': 'pcp', 'Heating Degree Days': 'hdd'}
-
+parameter_dict = {'Average Temperature': 'tavg', 'Maximum Temperature': 'tmax', 'Minimum Temperature': 'tmin', \
+                  'Precipitation': 'pcp', 'Heating Degree Days': 'hdd'}
 
 # get list of all states in usa
 states = list(state_mapping.keys())
-
 
 # STREAMLIT STUFF
 
 header = st.container()
 dataset = st.container()
 GDP_plot = st.container()
-climate_plots = st.container()
-climate_plots_2 = st.container()
-
-
-
-
-
+climate_plots_A = st.container()
+climate_plots_B = st.container()
 
 with GDP_plot:
-
     st.header("Agriculture GDP statewise")
     st.text("Real Gross Domestic Product: Farms ")
 
@@ -165,22 +155,20 @@ with GDP_plot:
 
     chart_selected_df = fred.get_series(state_mapping[states_selection][0])
 
-    
-
     fig = px.line(chart_selected_df)
 
     # updating title, and layout of plot
     fig.update_layout(
-    title=f'GDP (Farms) of {states_selection}',
-    xaxis_title="year",
-    yaxis_title="Millions of Dollars",
-    font=dict(
-        family="Courier New, monospace",
-        size=18
-    ))
+        title=f'GDP (Farms) of {states_selection}',
+        xaxis_title="year",
+        yaxis_title="Millions of Dollars",
+        font=dict(
+            family="Courier New, monospace",
+            size=18
+        ))
 
     # Converting series into dataframe
-    chart_selected_df = pd.DataFrame(chart_selected_df , columns=['GDP_value'])
+    chart_selected_df = pd.DataFrame(chart_selected_df, columns=['GDP_value'])
     # extracting only year from date column
     year_df = chart_selected_df.index
     year_df = year_df.astype(str).str[:4]
@@ -188,245 +176,160 @@ with GDP_plot:
     # resetting index with just year
     chart_selected_df.set_index(year_df, inplace=True, drop=True)
     # Dropping first column (to get years from 1998 instead of 1997)
-    chart_selected_df = chart_selected_df.iloc[1: , :]
-
+    chart_selected_df = chart_selected_df.iloc[1:, :]
 
     st.write(fig)
 
-
-with climate_plots:
+with climate_plots_A:
     st.header(f'Climate of {states_selection}')
     st.text("Plotting climate data")
 
-    left_col , right_col = st.columns([3,3])
-    
+    left_col, right_col = st.columns([3, 3])
+
 
     def get_climate_data(start_year, end_year, parameter, state_num):
-        climate_series_url = f'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/statewide/time-series/{state_num}/{parameter}/ann/12/{start_year}-{end_year}.csv?base_prd=true&begbaseyear=1901&endbaseyear=2000'
+        """
+        :param start_year: start year for the duration of dataset
+        :param end_year: end year for the duration of dataset
+        :param parameter: climatic parameter, in parameter_dict
+        :param state_num: state number from the state_mapping dictionary
+        :return: returns a dataframe with from start to end year for specific parameter and specific state
+        """
+
+        climate_series_url = f'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/statewide/time-series/' \
+                             f'{state_num}/{parameter}/ann/12/{start_year}-{end_year}.csv?base_prd=true&begbaseyear=1901&endbaseyear=2000'
         print(f'climate url : {climate_series_url}')
-        climate_series = pd.read_csv(climate_series_url, index_col='Date', skiprows=4, usecols=['Value', 'Date'],
+        climate_df = pd.read_csv(climate_series_url, index_col='Date', skiprows=4, usecols=['Value', 'Date'],
                                      on_bad_lines='skip')
-        year = climate_series.index
+        year = climate_df.index
         year = year.astype(str).str[:4]
 
         # resetting index with just year
-        climate_series.set_index(year, inplace=True, drop=True)
+        climate_df.set_index(year, inplace=True, drop=True)
 
-        return climate_series
+        return climate_df
 
+    def calc_corr(df, climate_df):
+        """
+        :param df: GDP dataframe for specific state
+        :param climate_df: climate data for the same state
+        :return: magnitude of correlation between the GDP values and climate values
+        """
+        correlation = df['GDP_value'].corr(climate_df['Value'])
+        correlation = round(correlation, 2)
 
-    # getting climate precipiation series data from the link
-    
-    url_start_year = '1998'
-    url_end_year = '2022'
-    url_parameter = 'pcp'
-    # url_state_no = '8'
-    url_state_no = state_mapping[states_selection][1]
-    # url_state_no = str(state_mapping['Florida'][1])
-
-    climate_series = get_climate_data(url_start_year, url_end_year, url_parameter, url_state_no)
-
-    # climate_series_url = f'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/statewide/time-series/{url_state_no}/{url_parameter}/ann/12/{url_start_year}-{url_end_year}?base_prd=true&begbaseyear=1901&endbaseyear=2000'
-    # climate_series_url = f'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/statewide/time-series/{url_state_no}/{url_parameter}/ann/12/{url_start_year}-{url_end_year}.csv?base_prd=true&begbaseyear=1901&endbaseyear=2000'
-    # print(f'climate url : {climate_series_url}')
-    # climate_series = pd.read_csv(climate_series_url, index_col='Date' , skiprows=4, usecols=['Value', 'Date'], on_bad_lines='skip')
-    #
-    # # extracting only year from date column
-    # year = climate_series.index
-    # year = year.astype(str).str[:4]
-    #
-    # # resetting index with just year
-    # climate_series.set_index(year, inplace=True, drop=True)
+        return correlation
 
 
 
-    # climate_series = pd.read_csv(climate_series_url, index_col='Date' , skiprows=4, usecols=['Value', 'Date'])
-    print(f'Climate series head : {climate_series.head()}')
+
+
+    # getting climate precipitation series data from the link
+    climate_series_1 = get_climate_data('1998', '2022', 'pcp', state_mapping[states_selection][1])
+
+    print(f'Climate series head : {climate_series_1.head()}')
 
     # Creating plot
-    fig_climate = px.line(climate_series, title=f'Precipitation of {states_selection} ')
+    fig_climate = px.line(climate_series_1, title=f'Precipitation of {states_selection} ')
 
     # updating title, and layout of plot
     fig_climate.update_layout(
-    title=f'Precipitation of {states_selection}',
-    xaxis_title="year",
-    yaxis_title="precipitation in mm",
-    # legend_title="GDP in millions",
-    font=dict(
-        family="Courier New, monospace",
-        size=18
-    ))
-
+        title=f'Precipitation of {states_selection}',
+        xaxis_title="year",
+        yaxis_title="precipitation in mm",
+        # legend_title="GDP in millions",
+        font=dict(
+            family="Courier New, monospace",
+            size=18
+        ))
 
     # Correlation metric for precipitation
-    corr = chart_selected_df['GDP_value'].corr(climate_series['Value'])
-    corr = round(corr, 2)
+    corr = calc_corr(chart_selected_df, climate_series_1)
 
-    left_col.metric(label="Correlation", value= corr)
-
+    left_col.metric(label="Correlation", value=corr)
     left_col.write(fig_climate)
 
-
-
-################################################################################################
-
+    ################################################################################################
 
     # getting climate Heating Degree Days series data from the link
-    
-    url_start_year_hdd = '1998'
-    url_end_year_hdd   = '2022'
-    url_parameter_hdd = 'hdd'
-    # url_state_no = '8'
-    url_state_no_hdd = state_mapping[states_selection][1]
-    # url_state_no = str(state_mapping['Florida'][1])
-
-    
-    # climate_series_url = f'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/statewide/time-series/{url_state_no}/{url_parameter}/ann/12/{url_start_year}-{url_end_year}?base_prd=true&begbaseyear=1901&endbaseyear=2000'
-    climate_series_url_2 = f'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/statewide/time-series/{url_state_no_hdd}/{url_parameter_hdd}/ann/12/{url_start_year_hdd}-{url_end_year_hdd}.csv?base_prd=true&begbaseyear=1901&endbaseyear=2000'
-    print(f'climate url : {climate_series_url_2}')
-    climate_series_2 = pd.read_csv(climate_series_url_2, index_col='Date' , skiprows=4, usecols=['Value', 'Date'], on_bad_lines='skip')
-    
-    # extracting only year from date column
-    year_hdd = climate_series_2.index
-    year_hdd = year_hdd.astype(str).str[:4]
-
-    # resetting index with just year
-    climate_series_2.set_index(year_hdd, inplace=True, drop=True)
-
-
+    climate_series_2 = get_climate_data('1998', '2022', 'hdd', state_mapping[states_selection][1])
 
     # climate_series = pd.read_csv(climate_series_url, index_col='Date' , skiprows=4, usecols=['Value', 'Date'])
-    print(f'Climate series No 2 head : {climate_series.head()}')
+    print(f'Climate series No 2 head : {climate_series_2.head()}')
 
     # Creating plot 2
     fig_climate_2 = px.line(climate_series_2, title=f'Heating Degree Days of {states_selection} ')
 
     # Updating title and layout of plot
     fig_climate_2.update_layout(
-    title=f'Heating Degree days of {states_selection}',
-    xaxis_title="year",
-    yaxis_title="Fahrenheit Degree-Days",
-    # legend_title="GDP in millions",
-    font=dict(
-        family="Courier New, monospace",
-        size=18
-    ))
+        title=f'Heating Degree days of {states_selection}',
+        xaxis_title="year",
+        yaxis_title="Fahrenheit Degree-Days",
+        # legend_title="GDP in millions",
+        font=dict(
+            family="Courier New, monospace",
+            size=18
+        ))
 
     # Correlation metric for heating days
-    corr_2 = chart_selected_df['GDP_value'].corr(climate_series_2['Value'])
-    corr_2 = round(corr_2, 2)
+    corr_2 = calc_corr(chart_selected_df, climate_series_2)
 
-    right_col.metric(label="Correlation", value= corr_2)
-
+    right_col.metric(label="Correlation", value=corr_2)
     right_col.write(fig_climate_2)
 
-
-with climate_plots_2:
-
-    left_col , right_col = st.columns([3,3])
-    
+with climate_plots_B:
+    left_col, right_col = st.columns([3, 3])
 
     # getting Max temp of state
-    
-    url_start_year = '1998'
-    url_end_year   = '2022'
-    url_parameter = 'tmax'
-    # url_state_no = '8'
-    url_state_no = state_mapping[states_selection][1]
-    # url_state_no = str(state_mapping['Florida'][1])
-
-    
-
-    # climate_series_url = f'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/statewide/time-series/{url_state_no}/{url_parameter}/ann/12/{url_start_year}-{url_end_year}?base_prd=true&begbaseyear=1901&endbaseyear=2000'
-    climate_series_url = f'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/statewide/time-series/{url_state_no}/{url_parameter}/ann/12/{url_start_year}-{url_end_year}.csv?base_prd=true&begbaseyear=1901&endbaseyear=2000'
-    print(f'climate url : {climate_series_url}')
-    climate_series = pd.read_csv(climate_series_url, index_col='Date' , skiprows=4, usecols=['Value', 'Date'], on_bad_lines='skip')
-    # extracting only year from date column
-    year = climate_series.index
-    year = year.astype(str).str[:4]
-
-    # resetting index with just year
-    climate_series.set_index(year, inplace=True, drop=True)
-
-
+    climate_series_3 = get_climate_data('1998', '2022', 'tmax', state_mapping[states_selection][1])
 
     # climate_series = pd.read_csv(climate_series_url, index_col='Date' , skiprows=4, usecols=['Value', 'Date'])
-    print(f'Climate series head : {climate_series.head()}')
+    print(f'Climate series head : {climate_series_3.head()}')
 
     # Creating plot
-    fig_climate = px.line(climate_series, title=f'Maximum Temp of {states_selection} ')
+    fig_climate = px.line(climate_series_3, title=f'Maximum Temp of {states_selection} ')
 
     # updating title, and layout of plot
     fig_climate.update_layout(
-    title=f'Max temp of {states_selection}',
-    xaxis_title="year",
-    yaxis_title="Degrees Fahrenheit",
-    # legend_title="GDP in millions",
-    font=dict(
-        family="Courier New, monospace",
-        size=18
-    ))
-
+        title=f'Max temp of {states_selection}',
+        xaxis_title="year",
+        yaxis_title="Degrees Fahrenheit",
+        # legend_title="GDP in millions",
+        font=dict(
+            family="Courier New, monospace",
+            size=18
+        ))
 
     # Correlation metric for precipitation
-    corr = chart_selected_df['GDP_value'].corr(climate_series['Value'])
-    corr = round(corr, 2)
+    corr_3 = calc_corr(chart_selected_df, climate_series_3)
 
-    left_col.metric(label="Correlation", value= corr)
-
+    left_col.metric(label="Correlation", value=corr_3)
     left_col.write(fig_climate)
 
-
-
-################################################################################################
-
+    ################################################################################################
 
     # getting Min temp data of state
-    
-    url_start_year_hdd = '1998'
-    url_end_year_hdd   = '2022'
-    url_parameter_hdd = 'tmin'
-    # url_state_no = '8'
-    url_state_no_hdd = state_mapping[states_selection][1]
-    # url_state_no = str(state_mapping['Florida'][1])
-
-    
-    # climate_series_url = f'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/statewide/time-series/{url_state_no}/{url_parameter}/ann/12/{url_start_year}-{url_end_year}?base_prd=true&begbaseyear=1901&endbaseyear=2000'
-    climate_series_url_2 = f'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/statewide/time-series/{url_state_no_hdd}/{url_parameter_hdd}/ann/12/{url_start_year_hdd}-{url_end_year_hdd}.csv?base_prd=true&begbaseyear=1901&endbaseyear=2000'
-    print(f'climate url : {climate_series_url_2}')
-    climate_series_2 = pd.read_csv(climate_series_url_2, index_col='Date' , skiprows=4, usecols=['Value', 'Date'], on_bad_lines='skip')
-    
-    # extracting only year from date column
-    year_hdd = climate_series_2.index
-    year_hdd = year_hdd.astype(str).str[:4]
-
-    # resetting index with just year
-    climate_series_2.set_index(year, inplace=True, drop=True)
-
-
+    climate_series_4 = get_climate_data('1998', '2022', 'tmin', state_mapping[states_selection][1])
 
     # climate_series = pd.read_csv(climate_series_url, index_col='Date' , skiprows=4, usecols=['Value', 'Date'])
-    print(f'Climate series No 2 head : {climate_series.head()}')
+    print(f'Climate series No 2 head : {climate_series_4.head()}')
 
     # Creating plot 2
-    fig_climate_2 = px.line(climate_series_2, title=f'Min Temp of {states_selection} ')
+    fig_climate_2 = px.line(climate_series_4, title=f'Min Temp of {states_selection} ')
 
     # Updating title and layout of plot
     fig_climate_2.update_layout(
-    title=f'Min temp of {states_selection}',
-    xaxis_title="year",
-    yaxis_title="Degree Fahrenheit ",
-    # legend_title="GDP in millions",
-    font=dict(
-        family="Courier New, monospace",
-        size=18
-    ))
+        title=f'Min temp of {states_selection}',
+        xaxis_title="year",
+        yaxis_title="Degree Fahrenheit ",
+        # legend_title="GDP in millions",
+        font=dict(
+            family="Courier New, monospace",
+            size=18
+        ))
 
     # Correlation metric for heating days
-    corr_2 = chart_selected_df['GDP_value'].corr(climate_series_2['Value'])
-    corr_2 = round(corr_2, 2)
+    corr_4 = calc_corr(chart_selected_df, climate_series_4)
 
-    right_col.metric(label="Correlation", value= corr_2)
-
+    right_col.metric(label="Correlation", value=corr_4)
     right_col.write(fig_climate_2)
-
