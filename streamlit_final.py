@@ -143,6 +143,42 @@ GDP_plot = st.container()
 climate_plots_A = st.container()
 climate_plots_B = st.container()
 
+
+def get_climate_data(start_year, end_year, parameter, state_num):
+    """
+    :param start_year: start year for the duration of dataset
+    :param end_year: end year for the duration of dataset
+    :param parameter: climatic parameter, in parameter_dict
+    :param state_num: state number from the state_mapping dictionary
+    :return: returns a dataframe with from start to end year for specific parameter and specific state
+    """
+
+    climate_series_url = f'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/statewide/time-series/' \
+                         f'{state_num}/{parameter}/ann/12/{start_year}-{end_year}.csv?base_prd=true&begbaseyear=1901&endbaseyear=2000'
+    print(f'climate url : {climate_series_url}')
+    climate_df = pd.read_csv(climate_series_url, index_col='Date', skiprows=4, usecols=['Value', 'Date'],
+                             on_bad_lines='skip')
+    year = climate_df.index
+    year = year.astype(str).str[:4]
+
+    # resetting index with just year
+    climate_df.set_index(year, inplace=True, drop=True)
+
+    return climate_df
+
+
+def calc_corr(df, climate_df):
+    """
+    :param df: GDP dataframe for specific state
+    :param climate_df: climate data for the same state
+    :return: magnitude of correlation between the GDP values and climate values
+    """
+    correlation = df['GDP_value'].corr(climate_df['Value'])
+    correlation = round(correlation, 2)
+
+    return correlation
+
+
 with GDP_plot:
     st.header("Agriculture GDP statewise")
     st.text("Real Gross Domestic Product: Farms ")
@@ -180,49 +216,12 @@ with GDP_plot:
 
     st.write(fig)
 
+
 with climate_plots_A:
     st.header(f'Climate of {states_selection}')
     st.text("Plotting climate data")
 
     left_col, right_col = st.columns([3, 3])
-
-
-    def get_climate_data(start_year, end_year, parameter, state_num):
-        """
-        :param start_year: start year for the duration of dataset
-        :param end_year: end year for the duration of dataset
-        :param parameter: climatic parameter, in parameter_dict
-        :param state_num: state number from the state_mapping dictionary
-        :return: returns a dataframe with from start to end year for specific parameter and specific state
-        """
-
-        climate_series_url = f'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/statewide/time-series/' \
-                             f'{state_num}/{parameter}/ann/12/{start_year}-{end_year}.csv?base_prd=true&begbaseyear=1901&endbaseyear=2000'
-        print(f'climate url : {climate_series_url}')
-        climate_df = pd.read_csv(climate_series_url, index_col='Date', skiprows=4, usecols=['Value', 'Date'],
-                                     on_bad_lines='skip')
-        year = climate_df.index
-        year = year.astype(str).str[:4]
-
-        # resetting index with just year
-        climate_df.set_index(year, inplace=True, drop=True)
-
-        return climate_df
-
-    def calc_corr(df, climate_df):
-        """
-        :param df: GDP dataframe for specific state
-        :param climate_df: climate data for the same state
-        :return: magnitude of correlation between the GDP values and climate values
-        """
-        correlation = df['GDP_value'].corr(climate_df['Value'])
-        correlation = round(correlation, 2)
-
-        return correlation
-
-
-
-
 
     # getting climate precipitation series data from the link
     climate_series_1 = get_climate_data('1998', '2022', 'pcp', state_mapping[states_selection][1])
