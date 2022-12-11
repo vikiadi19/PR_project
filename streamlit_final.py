@@ -78,6 +78,7 @@ state_mapping_GDP = {
  'New Hampshire' : 'NHRGSP'
 }
 
+# Dict --> State: [GDP code,
 state_mapping = {'California': ['CAFARMRGSP', 4],
                  'Florida': ['FLFARMRGSP', 8],
                  'Minnesota': ['MNFARMRGSP', 21],
@@ -130,6 +131,8 @@ state_mapping = {'California': ['CAFARMRGSP', 4],
                  'Indiana': ['INFARMRGSP', 12],
                  'New Hampshire': ['NHFARMRGSP', 27]}
 
+parameter_dict = {'Average Temperature': 'tavg', 'Maximum Temperature': 'tmax', 'Minimum Temperature': 'tmin',\
+             'Precipitation': 'pcp', 'Heating Degree Days': 'hdd'}
 
 
 # get list of all states in usa
@@ -147,88 +150,16 @@ climate_plots_2 = st.container()
 
 
 
-# with header:
-#     st.title("welcome to project")
-#     st.text("project descr")
-
-#     all_results = []
-
-#     for key_state, value in state_mapping_GDP.items():
-#         results = fred.get_series(state_mapping_GDP[key_state])
-#         results = results.to_frame(name = key_state)
-#         all_results.append(results)
-
-#     gdp_result = pd.concat(all_results, axis=1)
-
-#     # --------------- subplots ------------------------
-
-        
-#     fig, axs = plt.subplots(10, 5, figsize = (30,30), sharex=True)
-#     axs = axs.flatten()
-
-#     i = 0
-#     for key_state, value in state_mapping_GDP.items():
-#         if i == 50:
-#             continue
-#         ax2 = axs[i].twinx()
-#         chart_selected_df = fred.get_series(state_mapping_GDP[key_state])
-#         axs[i].set_title(key_state, fontsize = 10)
-#         chart_selected_df.plot(ax=ax2)
-#         ax2.grid(False)
-#         i += 1
-
-#     plt.tight_layout()
-
-#     # st.write(plt.show())
-#     st.pyplot(fig)
-
-# with dataset:
-#     st.header("Agriculture GDP Comparison")
-#     st.text("dataset about taxi driver")
-
-#     # PULLING RAW DATA - SERIES
-#     il_gdp = fred.get_series('NGMP16980')
-
-
-#     fig_farm = px.line(il_gdp, title='illinois gdp')
-#     fig_farm.update_layout(
-#     title="illinois gdP",
-#     xaxis_title="Year",
-#     yaxis_title="GDP",
-#     legend_title="GDP in millions",
-#     font=dict(
-#         family="Courier New, monospace",
-#         size=18
-#     ))
-
-#     st.write(fig_farm)
 
 
 with GDP_plot:
-    # df_st = fred.search('Real Gross Domestic Product: All Industry Total in*', order_by='popularity')
-    # filt = (len(df_st['id']) <= 6)
-    # mask = (df_st['id'].str.len() <= 6)
-    # df_st = df_st.loc[mask]
 
-    # df_st = df_st.loc[df_st['title'].str.contains('Real Gross Domestic Product: All Industry Total in*')]
-    # result_title_list = df_st['title'].tolist()
-
-
-    # # df_st is the dataframe which has the series name and the chart titles of all search results
-    # df_st
-
-    # # show the list
-    # for each in result_title_list:
-    #     print(each)
-
-
-##-------------------------------------------------------------------------------------------------------
     st.header("Agriculture GDP statewise")
     st.text("Real Gross Domestic Product: Farms ")
 
     sel_col, disp_col = st.columns(2)
 
-    states_selection = sel_col.selectbox('Select the state to see its GDP', options = states, index=12)
+    states_selection = sel_col.selectbox('Select the state to see its GDP', options=states, index=12)
 
     # chart_selection = sel_col.selectbox('Real GDP vs Nominal GDP', options = ['Real', 'Nominal'], index=0)
 
@@ -270,27 +201,42 @@ with climate_plots:
     left_col , right_col = st.columns([3,3])
     
 
+    def get_climate_data(start_year, end_year, parameter, state_num):
+        climate_series_url = f'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/statewide/time-series/{state_num}/{parameter}/ann/12/{start_year}-{end_year}.csv?base_prd=true&begbaseyear=1901&endbaseyear=2000'
+        print(f'climate url : {climate_series_url}')
+        climate_series = pd.read_csv(climate_series_url, index_col='Date', skiprows=4, usecols=['Value', 'Date'],
+                                     on_bad_lines='skip')
+        year = climate_series.index
+        year = year.astype(str).str[:4]
+
+        # resetting index with just year
+        climate_series.set_index(year, inplace=True, drop=True)
+
+        return climate_series
+
+
     # getting climate precipiation series data from the link
     
     url_start_year = '1998'
-    url_end_year   = '2022'
+    url_end_year = '2022'
     url_parameter = 'pcp'
     # url_state_no = '8'
     url_state_no = state_mapping[states_selection][1]
     # url_state_no = str(state_mapping['Florida'][1])
 
-    
-    # climate_series_url = f'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/statewide/time-series/{url_state_no}/{url_parameter}/ann/12/{url_start_year}-{url_end_year}?base_prd=true&begbaseyear=1901&endbaseyear=2000'
-    climate_series_url = f'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/statewide/time-series/{url_state_no}/{url_parameter}/ann/12/{url_start_year}-{url_end_year}.csv?base_prd=true&begbaseyear=1901&endbaseyear=2000'
-    print(f'climate url : {climate_series_url}')
-    climate_series = pd.read_csv(climate_series_url, index_col='Date' , skiprows=4, usecols=['Value', 'Date'], on_bad_lines='skip')
-    
-    # extracting only year from date column
-    year = climate_series.index
-    year = year.astype(str).str[:4]
+    climate_series = get_climate_data(url_start_year, url_end_year, url_parameter, url_state_no)
 
-    # resetting index with just year
-    climate_series.set_index(year, inplace=True, drop=True)
+    # climate_series_url = f'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/statewide/time-series/{url_state_no}/{url_parameter}/ann/12/{url_start_year}-{url_end_year}?base_prd=true&begbaseyear=1901&endbaseyear=2000'
+    # climate_series_url = f'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/statewide/time-series/{url_state_no}/{url_parameter}/ann/12/{url_start_year}-{url_end_year}.csv?base_prd=true&begbaseyear=1901&endbaseyear=2000'
+    # print(f'climate url : {climate_series_url}')
+    # climate_series = pd.read_csv(climate_series_url, index_col='Date' , skiprows=4, usecols=['Value', 'Date'], on_bad_lines='skip')
+    #
+    # # extracting only year from date column
+    # year = climate_series.index
+    # year = year.astype(str).str[:4]
+    #
+    # # resetting index with just year
+    # climate_series.set_index(year, inplace=True, drop=True)
 
 
 
@@ -345,7 +291,7 @@ with climate_plots:
     year_hdd = year_hdd.astype(str).str[:4]
 
     # resetting index with just year
-    climate_series_2.set_index(year, inplace=True, drop=True)
+    climate_series_2.set_index(year_hdd, inplace=True, drop=True)
 
 
 
@@ -390,11 +336,11 @@ with climate_plots_2:
     # url_state_no = str(state_mapping['Florida'][1])
 
     
+
     # climate_series_url = f'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/statewide/time-series/{url_state_no}/{url_parameter}/ann/12/{url_start_year}-{url_end_year}?base_prd=true&begbaseyear=1901&endbaseyear=2000'
     climate_series_url = f'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/statewide/time-series/{url_state_no}/{url_parameter}/ann/12/{url_start_year}-{url_end_year}.csv?base_prd=true&begbaseyear=1901&endbaseyear=2000'
     print(f'climate url : {climate_series_url}')
     climate_series = pd.read_csv(climate_series_url, index_col='Date' , skiprows=4, usecols=['Value', 'Date'], on_bad_lines='skip')
-    
     # extracting only year from date column
     year = climate_series.index
     year = year.astype(str).str[:4]
