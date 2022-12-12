@@ -1,11 +1,12 @@
 # Loading Packages
 import pandas as pd
+import os
 # import numpy as np
 import matplotlib.pyplot as plt
 import plotly.express as px
 import streamlit as st
 st.set_page_config(layout="wide")
-import os
+
 from fredapi import Fred
 
 from dotenv import load_dotenv
@@ -201,11 +202,9 @@ states = list(state_mapping.keys())
 header = st.container()
 dataset = st.container()
 GDP_plot = st.container()
+GDP_plot_2 = st.container()
 climate_plots_A = st.container()
 climate_plots_B = st.container()
-GDP_plot_2 = st.container()
-climate_plots_AA = st.container()
-climate_plots_BB = st.container()
 
 def get_climate_data(start_year, end_year, parameter, state_num):
     """
@@ -293,23 +292,26 @@ with GDP_plot_2:
     st.header("GDP: Agriculture, Forestry, Fishing and Hunting statewise")
     st.text("Real Gross Domestic Product: Agriculture, Forestry, Fishing and Hunting (NAICS 11) ")
 
-    sel_col, disp_col = st.columns(2)
+    # sel_col, disp_col = st.columns(2)
 
     # states_selection = sel_col.selectbox('Select the state to see its GDP', options=states, index=12)
 
     # chart_selection = sel_col.selectbox('Real GDP vs Nominal GDP', options = ['Real', 'Nominal'], index=0)
 
     chart_selected_df_2 = fred.get_series(state_mapping_GDP_2[states_selection])
+    print(f'second dataframe {chart_selected_df_2.head()}')
+
 
     chart_selected_df_2 = pd.DataFrame(chart_selected_df_2, columns=['GDP_value'])
     chart_selected_df_2.index = chart_selected_df_2.index.year
     chart_selected_df_2.index = chart_selected_df_2.index.astype('str')
-    chart_selected_df_2 = chart_selected_df.iloc[1:, :]
+    chart_selected_df_2 = chart_selected_df_2.iloc[1:, :]
 
     # Plotting data v/s year
-    fig_2 = create_plot('GDP(Farms)', '$ (Millions)', chart_selected_df_2)
 
-    st.write(fig_2)
+    figure_2 = create_plot('GDP(Agriculture, Forestry, Fishing and Hunting)', '$(Millions)', chart_selected_df_2)
+
+    st.write(figure_2)
 
 
 
