@@ -4,16 +4,21 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.express as px
 import streamlit as st
-from fredapi import Fred
 st.set_page_config(layout="wide")
+import os
+from fredapi import Fred
 
+from dotenv import load_dotenv
+
+load_dotenv()
+# ENVIRONMENT VARIABLES
 
 # Using FRED API Key
-fred_key = 'e97ead98bf794c0a4316ef8c10370f31'
+FRED_API_KEY = os.getenv("FRED_API_KEY")
 
 # CREATING FRED OBJECT
 try:
-    fred = Fred(api_key=fred_key)
+    fred = Fred(api_key=FRED_API_KEY)
 except ValueError:
     print('Create your API key. Instructions in readme.md')
 
