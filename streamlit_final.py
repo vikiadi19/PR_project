@@ -24,6 +24,59 @@ plt.style.use('fivethirtyeight')
 pd.options.display.max_columns = 500
 color_pal = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 
+state_mapping_GDP_2 = {
+'Alabama' : 'ALAGRNGSP',
+'Alaska' : 'AKAGRNGSP',
+'Arizona' : 'AZAGRNGSP',
+'Arkansas' : 'ARAGRNQGSP',
+'California' : 'CAAGRNGSP',
+'Colorado' : 'COAGRNGSP',
+'Connecticut' : 'CTAGRNQGSP',
+'Delaware' : 'DEAGRRQGSP',
+'Florida' : 'FLAGRNQGSP',
+'Georgia' : 'GAAGRNGSP',
+'Hawaii' : 'HIAGRNGSP',
+'Idaho' : 'IDAGRNGSP',
+'Illinois' : 'ILAGRNGSP',
+'Indiana' : 'INAGRNQGSP',
+'Iowa' : 'IAAGRNQGSP',
+'Kansas' : 'KSAGRNQGSP',
+'Kentucky' : 'KYAGRNQGSP',
+'Louisiana' : 'LAAGRRGSP',
+'Maine' : 'MEAGRNGSP',
+'Maryland' : 'MDAGRNQGSP',
+'Massachusetts' : 'MAAGRRGSP',
+'Michigan' : 'MIAGRNGSP',
+'Minnesota' : 'MNAGRNGSP',
+'Mississippi' : 'MSAGRNGSP',
+'Missouri' : 'MOAGRNGSP',
+'Montana' : 'MTAGRNGSP',
+'Nebraska' : 'NEAGRNGSP',
+'Nevada' : 'NVAGRNGSP',
+'New Hampshire' : 'NHAGRNGSP',
+'New Jersey' : 'NJAGRNQGSP',
+'New Mexico' : 'NMAGRNGSP',
+'New York' : 'NYAGRNGSP',
+'North Carolina' : 'NCAGRNGSP',
+'North Dakota' : 'NDAGRNGSP',
+'Ohio' : 'OHAGRNGSP',
+'Oklahoma' : 'OKAGRNGSP',
+'Oregon' : 'ORAGRNGSP',
+'Pennsylvania' : 'PAAGRNGSP',
+'Rhode Island' : 'RIAGRNGSP',
+'South Carolina' : 'SCAGRNQGSP',
+'South Dakota' : 'SDAGRNGSP',
+'Tennessee' : 'TNAGRNGSP',
+'Texas' : 'TXAGRNGSP',
+'Utah' : 'UTAGRNGSP',
+'Vermont' : 'VTAGRRQGSP',
+'Virginia' : 'WVAGRNGSP',
+'Washington' : 'WAAGRNGSP',
+'West Virginia' : 'WVAGRNGSP',
+'Wisconsin' : 'WIAGRNGSP',
+'Wyoming' : 'WYAGRNGSP',
+}
+
 state_mapping_GDP = {
     'California': 'CARGSP',
     'Florida': 'FLRGSP',
@@ -145,7 +198,9 @@ dataset = st.container()
 GDP_plot = st.container()
 climate_plots_A = st.container()
 climate_plots_B = st.container()
-
+GDP_plot_2 = st.container()
+climate_plots_AA = st.container()
+climate_plots_BB = st.container()
 
 def get_climate_data(start_year, end_year, parameter, state_num):
     """
@@ -207,7 +262,7 @@ def create_plot(parameter, y_axis_title, df):
 
 
 with GDP_plot:
-    st.header("Agriculture GDP statewise")
+    st.header("GDP: FARM statewise")
     st.text("Real Gross Domestic Product: Farms ")
 
     sel_col, disp_col = st.columns(2)
@@ -229,6 +284,30 @@ with GDP_plot:
     st.write(fig)
 
 
+with GDP_plot_2:
+    st.header("GDP: Agriculture, Forestry, Fishing and Hunting statewise")
+    st.text("Real Gross Domestic Product: Agriculture, Forestry, Fishing and Hunting (NAICS 11) ")
+
+    sel_col, disp_col = st.columns(2)
+
+    # states_selection = sel_col.selectbox('Select the state to see its GDP', options=states, index=12)
+
+    # chart_selection = sel_col.selectbox('Real GDP vs Nominal GDP', options = ['Real', 'Nominal'], index=0)
+
+    chart_selected_df_2 = fred.get_series(state_mapping_GDP_2[states_selection])
+
+    chart_selected_df_2 = pd.DataFrame(chart_selected_df_2, columns=['GDP_value'])
+    chart_selected_df_2.index = chart_selected_df_2.index.year
+    chart_selected_df_2.index = chart_selected_df_2.index.astype('str')
+    chart_selected_df_2 = chart_selected_df.iloc[1:, :]
+
+    # Plotting data v/s year
+    fig_2 = create_plot('GDP(Farms)', '$ (Millions)', chart_selected_df_2)
+
+    st.write(fig_2)
+
+
+
 with climate_plots_A:
     st.header(f'Climate of {states_selection}')
     st.text("Plotting climate data")
@@ -246,7 +325,13 @@ with climate_plots_A:
     # Correlation metric for precipitation
     corr = calc_corr(chart_selected_df, climate_series_1)
 
-    left_col.metric(label="Correlation", value=corr)
+    # Correlation metric NO 2 for precipitation
+    corr_forr = calc_corr(chart_selected_df_2, climate_series_1)
+
+
+    left_col.metric(label="Correlation with GDP: FARM ", value=corr)
+    left_col.metric(label="Correlation with GDP: Agriculture, Forestry, Fishing and Hunting (NAICS 11)", value=corr_forr)
+
     left_col.write(fig_1)
 
     ################################################################################################
@@ -263,7 +348,12 @@ with climate_plots_A:
     # Correlation metric for heating days
     corr_2 = calc_corr(chart_selected_df, climate_series_2)
 
-    right_col.metric(label="Correlation", value=corr_2)
+    # Correlation metric for heating days
+    corr_2_forr = calc_corr(chart_selected_df_2, climate_series_2)
+
+    right_col.metric(label="Correlation with GDP: FARM ", value=corr_2)
+    right_col.metric(label="Correlation with GDP: Agriculture, Forestry, Fishing and Hunting (NAICS 11)", value=corr_2_forr)
+
     right_col.write(fig_2)
 
 with climate_plots_B:
@@ -276,10 +366,14 @@ with climate_plots_B:
 
     # Creating plot
     fig_3 = create_plot('Max temp', '°F', climate_series_3)
-    # Correlation metric for precipitation
-    corr_3 = calc_corr(chart_selected_df, climate_series_3)
 
-    left_col.metric(label="Correlation", value=corr_3)
+    # Correlation metric for Max Temp
+    corr_3 = calc_corr(chart_selected_df, climate_series_3)
+    corr_3_forr = calc_corr(chart_selected_df_2, climate_series_3)
+
+    left_col.metric(label="Correlation with GDP: FARM ", value=corr_3)
+    left_col.metric(label="Correlation with GDP: Agriculture, Forestry, Fishing and Hunting (NAICS 11) ", value=corr_3_forr)
+
     left_col.write(fig_3)
 
     ################################################################################################
@@ -294,8 +388,19 @@ with climate_plots_B:
     fig_4 = create_plot('Mim temp', '°F', climate_series_4)
 
 
-    # Correlation metric for heating days
+    # Correlation metric for heating days for GDP: FARM
     corr_4 = calc_corr(chart_selected_df, climate_series_4)
 
-    right_col.metric(label="Correlation", value=corr_4)
+    # Correlation metric for heating days for GDP: Forrestry
+    corr_4_forr = calc_corr(chart_selected_df_2, climate_series_4)
+
+
+    right_col.metric(label="Correlation with GDP: FARM ", value=corr_4)
+    right_col.metric(label="Correlation with GDP: Agriculture, Forestry, Fishing and Hunting (NAICS 11) ", value=corr_4_forr)
+
     right_col.write(fig_4)
+
+###########################################################################################################
+# creating plots of forestry,fishing,hunting etc
+############################################################################################################
+
